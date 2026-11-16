@@ -1,0 +1,8 @@
+node_modules/
+coverage/
+dist/
+.scratch/
+client.js
+package-lock.json
+test/fixtures/
+research/agents/

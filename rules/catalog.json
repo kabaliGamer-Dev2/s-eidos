@@ -1,0 +1,302 @@
+{
+  "schemaVersion": 1,
+  "catalogVersion": "0.1.0",
+  "asOf": "2026-11-16",
+  "supportPresets": {
+    "enterprise-chromium-lts": { "title": "Pinned enterprise Chromium", "rank": 1, "default": false },
+    "safari-16-plus": { "title": "Safari 16 or newer", "rank": 2, "default": false },
+    "last-2-versions": { "title": "Last 2 versions of the evergreen engines", "rank": 3, "default": false },
+    "baseline-widely-available": { "title": "Baseline widely available", "rank": 4, "default": true },
+    "safari-18-plus": { "title": "Safari 18 or newer", "rank": 5, "default": false },
+    "baseline-newly-available": { "title": "Baseline newly available", "rank": 6, "default": false },
+    "modern-2026": { "title": "Current Baseline snapshot (2026)", "rank": 7, "default": false },
+    "evergreen-desktop": { "title": "Current evergreen desktop engines", "rank": 8, "default": false }
+  },
+  "features": {
+    "prefers-reduced-motion": {
+      "title": "prefers-reduced-motion media query",
+      "doc": "https://developer.mozilla.org/en-US/docs/Web/CSS/@media/prefers-reduced-motion",
+      "rank": 2
+    }
+  },
+  "rules": [
+    {
+      "id": "SEM-001",
+      "title": "iframe has no accessible name",
+      "classification": "inaccessible",
+      "impact": ["accessibility"],
+      "severity": "medium",
+      "confidence": "high",
+      "remediationConfidence": "medium",
+      "tier": "a",
+      "detector": "attribute-missing",
+      "detectorParams": { "element": "iframe", "attributes": ["title", "aria-label", "aria-labelledby"] },
+      "appliesTo": {
+        "languages": ["html", "jsx", "tsx"],
+        "frameworks": ["plain", "react", "next-app", "next-pages"],
+        "fileKinds": ["markup"]
+      },
+      "supportGate": null,
+      "evidence": {
+        "url": "https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/iframe",
+        "title": "iframe element - HTML",
+        "authority": "MDN Web Docs",
+        "retrieved": "2026-11-16",
+        "reviewBy": "2027-11-16"
+      },
+      "standards": [{ "framework": "WCAG 2.2", "id": "4.1.2" }],
+      "why": "A frame without a name is announced as an unnamed frame, so a screen-reader user cannot tell what it contains before entering it.",
+      "detectionHint": "An iframe start tag whose attribute list contains none of title, aria-label or aria-labelledby.",
+      "falsePositives": [
+        "A decorative frame that sets aria-hidden=\"true\" on itself and holds no interactive content",
+        "A frame whose accessible name is supplied by a wrapper component that spreads the attribute at runtime"
+      ],
+      "migration": {
+        "before": "<iframe src=\"/map\" />",
+        "after": "<iframe src=\"/map\" title=\"Office location map\" />",
+        "notes": "The title must describe the frame's content; it cannot be generated automatically."
+      },
+      "autofix": "none",
+      "suppressible": true
+    },
+    {
+      "id": "SEM-002",
+      "title": "javascript: URL in a link or source",
+      "classification": "insecure",
+      "impact": ["security", "compatibility"],
+      "severity": "critical",
+      "confidence": "high",
+      "remediationConfidence": "high",
+      "tier": "a",
+      "detector": "unsafe-url-scheme",
+      "detectorParams": { "schemes": ["javascript:"] },
+      "appliesTo": {
+        "languages": ["html", "jsx", "tsx", "js", "ts"],
+        "frameworks": ["plain", "react", "next-app", "next-pages"],
+        "fileKinds": ["markup", "script"]
+      },
+      "supportGate": null,
+      "evidence": {
+        "url": "https://developer.mozilla.org/en-US/docs/Web/URI/Reference/Schemes/javascript",
+        "title": "javascript: URLs",
+        "authority": "MDN Web Docs",
+        "retrieved": "2026-11-16",
+        "reviewBy": "2027-11-16"
+      },
+      "standards": [{ "framework": "OWASP ASVS", "id": "1.3.1" }],
+      "why": "A javascript: URL executes script in the page's origin, is blocked by a Content-Security-Policy that forbids inline script, and is an injection sink whenever the value is not fully trusted.",
+      "detectionHint": "An href or src value (quoted HTML attribute or JSX string literal) whose scheme is javascript:.",
+      "falsePositives": [
+        "The literal appears inside a comment or a documentation string",
+        "A test asserts that such a value is rejected"
+      ],
+      "migration": {
+        "before": "<a href=\"javascript:void(0)\" onclick=\"save()\">Save</a>",
+        "after": "<button type=\"button\" onclick=\"save()\">Save</button>",
+        "notes": "When the element genuinely navigates, use a real URL; when it performs an action, use a button."
+      },
+      "autofix": "situational",
+      "suppressible": false
+    },
+    {
+      "id": "IMG-001",
+      "title": "img has no intrinsic dimensions",
+      "classification": "obsolete",
+      "impact": ["performance"],
+      "severity": "medium",
+      "confidence": "medium",
+      "remediationConfidence": "high",
+      "tier": "b",
+      "detector": "element-missing-dimensions",
+      "detectorParams": { "element": "img", "attributes": ["width", "height"] },
+      "appliesTo": {
+        "languages": ["html", "jsx", "tsx", "vue", "svelte"],
+        "frameworks": ["plain", "react", "next-app", "next-pages"],
+        "fileKinds": ["markup"]
+      },
+      "supportGate": null,
+      "evidence": {
+        "url": "https://web.dev/articles/optimize-cls",
+        "title": "Optimize Cumulative Layout Shift",
+        "authority": "web.dev",
+        "retrieved": "2026-11-16",
+        "reviewBy": "2027-05-16"
+      },
+      "standards": [],
+      "why": "Without width and height the browser cannot reserve space before the image loads, so content jumps and the layout shift is charged to the page.",
+      "detectionHint": "An img element with neither width nor height, in a file where no aspect-ratio is visible, and which is not a framework image component that reserves space itself.",
+      "falsePositives": [
+        "The image is rendered by next/image with fill, which requires absolute positioning and supplies its own sizing contract",
+        "The dimensions arrive through a design-system wrapper component rather than the tag",
+        "A stylesheet sets aspect-ratio for this element's class"
+      ],
+      "migration": {
+        "before": "<img src=\"/hero.jpg\" alt=\"Product\" />",
+        "after": "<img src=\"/hero.jpg\" alt=\"Product\" width=\"1200\" height=\"630\" />",
+        "notes": "Add the real intrinsic ratio; CSS can still size the rendered box."
+      },
+      "autofix": "none",
+      "suppressible": true
+    },
+    {
+      "id": "MET-001",
+      "title": "viewport blocks pinch zoom",
+      "classification": "inaccessible",
+      "impact": ["accessibility"],
+      "severity": "critical",
+      "confidence": "high",
+      "remediationConfidence": "high",
+      "tier": "a",
+      "detector": "viewport-zoom-locked",
+      "detectorParams": { "minimumScale": 5 },
+      "appliesTo": {
+        "languages": ["html"],
+        "frameworks": ["plain", "react", "next-app", "next-pages"],
+        "fileKinds": ["markup"]
+      },
+      "supportGate": null,
+      "evidence": {
+        "url": "https://developer.mozilla.org/en-US/docs/Web/HTML/Guides/Viewport_meta_element",
+        "title": "Viewport meta element",
+        "authority": "MDN Web Docs",
+        "retrieved": "2026-11-16",
+        "reviewBy": "2027-11-16"
+      },
+      "standards": [{ "framework": "WCAG 2.2", "id": "1.4.4" }],
+      "why": "Blocking zoom removes the only way a low-vision user can enlarge text on a phone, and no content benefits from it.",
+      "detectionHint": "A viewport meta tag containing user-scalable=no, or maximum-scale set below 5.",
+      "falsePositives": [
+        "A maximum-scale value of 5 or greater, which does not meaningfully restrict zoom",
+        "The pattern appears in a template that is never served (documentation, a test fixture)"
+      ],
+      "migration": {
+        "before": "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no\">",
+        "after": "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">"
+      },
+      "autofix": "safe",
+      "suppressible": false
+    },
+    {
+      "id": "ARI-001",
+      "title": "Large motion ignores prefers-reduced-motion",
+      "classification": "situational",
+      "impact": ["accessibility"],
+      "severity": "medium",
+      "confidence": "medium",
+      "remediationConfidence": "high",
+      "tier": "b",
+      "detector": "unguarded-motion",
+      "detectorParams": {
+        "properties": ["transform", "translate", "scale", "rotate", "animation", "parallax"],
+        "minimumDeclarations": 2
+      },
+      "appliesTo": {
+        "languages": ["css", "js", "ts"],
+        "frameworks": ["plain", "react", "next-app", "next-pages"],
+        "fileKinds": ["style", "script"]
+      },
+      "supportGate": {
+        "kind": "browser-feature",
+        "feature": "prefers-reduced-motion",
+        "requires": "safari-16-plus"
+      },
+      "evidence": {
+        "url": "https://developer.mozilla.org/en-US/docs/Web/CSS/@media/prefers-reduced-motion",
+        "title": "prefers-reduced-motion - CSS",
+        "authority": "MDN Web Docs",
+        "retrieved": "2026-11-16",
+        "reviewBy": "2027-11-16"
+      },
+      "standards": [{ "framework": "WCAG 2.2", "id": "2.3.3" }],
+      "why": "Motion sickness is a real vestibular response; a blanket animation that ignores the user's stated preference can make a page unusable for them.",
+      "detectionHint": "Two or more transform or animation declarations in a file that has no prefers-reduced-motion media block.",
+      "falsePositives": [
+        "Motion is limited to a short opacity fade, which is not a vestibular trigger",
+        "The reduced-motion guard lives in a shared stylesheet outside the scanned paths",
+        "The motion is a canvas or video background the author cannot express in CSS"
+      ],
+      "migration": {
+        "before": ".card { transition: transform 400ms; }",
+        "after": "@media (prefers-reduced-motion: reduce) { .card { transition: none; } }"
+      },
+      "autofix": "situational",
+      "suppressible": true
+    },
+    {
+      "id": "FRM-001",
+      "title": "autocomplete disabled on a credential field",
+      "classification": "obsolete",
+      "impact": ["correctness", "accessibility"],
+      "severity": "medium",
+      "confidence": "high",
+      "remediationConfidence": "medium",
+      "tier": "b",
+      "detector": "autocomplete-disabled-auth",
+      "detectorParams": { "hintPattern": "pass|pwd|user|email|login|account" },
+      "appliesTo": {
+        "languages": ["html", "jsx", "tsx", "vue", "svelte"],
+        "frameworks": ["plain", "react", "next-app", "next-pages"],
+        "fileKinds": ["markup"]
+      },
+      "supportGate": null,
+      "evidence": {
+        "url": "https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Attributes/autocomplete",
+        "title": "HTML attribute: autocomplete",
+        "authority": "MDN Web Docs",
+        "retrieved": "2026-11-16",
+        "reviewBy": "2027-11-16"
+      },
+      "standards": [{ "framework": "WCAG 2.2", "id": "1.3.5" }],
+      "why": "Browsers do not stop password managers because of autocomplete=off, so the attribute buys nothing while blocking the helpful autofill path and the correct field-purpose metadata.",
+      "detectionHint": "An input with autocomplete=\"off\" whose type is password, or whose name or id suggests a credential field.",
+      "falsePositives": [
+        "A genuinely one-time value that must not be stored, such as an OTP, where autocomplete=\"one-time-code\" is the better answer than off",
+        "A search field, where off is a legitimate preference"
+      ],
+      "migration": {
+        "before": "<input type=\"password\" name=\"password\" autocomplete=\"off\">",
+        "after": "<input type=\"password\" name=\"password\" autocomplete=\"current-password\">",
+        "notes": "Use current-password or new-password so the browser offers the right behaviour."
+      },
+      "autofix": "situational",
+      "suppressible": true
+    },
+    {
+      "id": "TYP-001",
+      "title": "@ts-ignore instead of @ts-expect-error",
+      "classification": "obsolete",
+      "impact": ["maintainability", "correctness"],
+      "severity": "medium",
+      "confidence": "high",
+      "remediationConfidence": "high",
+      "tier": "a",
+      "detector": "suppression-comment",
+      "detectorParams": { "directive": "@ts-ignore", "replacement": "@ts-expect-error" },
+      "appliesTo": {
+        "languages": ["ts", "tsx", "mts", "cts"],
+        "frameworks": ["react", "next-app", "next-pages", "plain"],
+        "fileKinds": ["script"]
+      },
+      "supportGate": { "kind": "framework-version", "framework": "typescript", "requires": ">=3.9" },
+      "evidence": {
+        "url": "https://www.typescriptlang.org/docs/handbook/release-notes/typescript-3-9.html",
+        "title": "TypeScript 3.9 release notes",
+        "authority": "typescriptlang.org",
+        "retrieved": "2026-11-16",
+        "reviewBy": "2027-11-16"
+      },
+      "standards": [],
+      "why": "@ts-expect-error fails when the error disappears, so the suppression removes itself; @ts-ignore silently outlives the bug it was hiding.",
+      "detectionHint": "A // @ts-ignore or /* @ts-ignore */ comment.",
+      "falsePositives": [
+        "The suppression targets a line that will never produce an error by design (for example a generated declaration file). The rule still reports it; use a reasoned decision record to suppress the finding."
+      ],
+      "migration": {
+        "before": "// @ts-ignore",
+        "after": "// @ts-expect-error -- value is populated by the loader above"
+      },
+      "autofix": "safe",
+      "suppressible": true
+    }
+  ]
+}

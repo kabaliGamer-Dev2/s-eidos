@@ -1,0 +1,84 @@
+{
+  "name": "s-eidos",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Evidence-backed front-end pattern review for coding agents: framework-aware findings with dated provenance, support-target gating, and auditable decisions.",
+  "license": "MIT",
+  "engines": {
+    "node": ">=22.0.0"
+  },
+  "bin": {
+    "s-eidos": "./bin/s-eidos.mjs"
+  },
+  "exports": {
+    ".": "./index.js",
+    "./client": "./client.js",
+    "./locale/*.json": "./locale/*.json",
+    "./icon": "./icon.svg",
+    "./engine": "./src/engine/index.mjs"
+  },
+  "files": [
+    "index.js",
+    "client.js",
+    "bin",
+    "src",
+    "rules",
+    "locale",
+    "skills",
+    "docs",
+    "cordis.patch.yml",
+    "icon.svg",
+    "README.md",
+    "LICENSE",
+    "NOTICE.md"
+  ],
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    },
+    "client": {
+      "platform": "web",
+      "immediately": true,
+      "inject": [
+        "@deepseek-ai/dsh-client-ui-sidebar",
+        "@deepseek-ai/dsh-client-ui-layout"
+      ]
+    }
+  },
+  "scripts": {
+    "test": "node --test --test-isolation=none \"test/*.test.mjs\"",
+    "audit:self": "node bin/s-eidos.mjs audit src test/fixtures/clean --format text",
+    "build": "node scripts/build-client.mjs",
+    "build:check": "node scripts/build-client.mjs --check",
+    "docs:rules": "node scripts/gen-rules-docs.mjs",
+    "docs:rules:check": "node scripts/gen-rules-docs.mjs --check",
+    "check:secrets": "node scripts/check-secrets.mjs",
+    "check:licenses": "node scripts/check-licenses.mjs",
+    "check:links": "node scripts/check-links.mjs",
+    "lint": "eslint .",
+    "format:check": "prettier --check \"**/*.{mjs,js,json,yml,yaml}\"",
+    "format": "prettier --write \"**/*.{mjs,js,json,yml,yaml}\"",
+    "check:syntax": "node scripts/check-syntax.mjs",
+    "verify": "node scripts/verify.mjs"
+  },
+  "keywords": [
+    "deepseek-harness",
+    "dsh",
+    "dsh-plugin",
+    "cordis",
+    "frontend",
+    "react",
+    "nextjs",
+    "typescript",
+    "accessibility",
+    "static-analysis",
+    "codemod",
+    "provenance"
+  ],
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "eslint": "^10.15.0",
+    "prettier": "^3.10.1"
+  }
+}

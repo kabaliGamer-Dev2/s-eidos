@@ -1,0 +1,13 @@
+.card {
+  transition: transform 400ms ease;
+}
+
+.hero {
+  animation: float 2s infinite;
+  transform: translateY(0);
+}
+
+@keyframes float {
+  from { transform: translateY(0); }
+  to { transform: translateY(-8px); }
+}

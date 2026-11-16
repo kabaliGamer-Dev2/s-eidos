@@ -1,0 +1,17 @@
+# Dependencies
+node_modules/
+
+# Local decision records produced by the tool when run inside this repository
+.verdigris/
+
+# Scratch space used during research; never shipped
+.scratch/
+
+# Build and test output
+dist/
+coverage/
+*.log
+
+# OS noise
+.DS_Store
+Thumbs.db
