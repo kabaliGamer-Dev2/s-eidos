@@ -175,15 +175,11 @@ export async function verify(options) {
     results.push(
       await check('test suite', async () => {
         try {
-          const { stdout } = await run(
-            process.execPath,
-            ['--test', '--test-isolation=none', 'test/*.test.mjs'],
-            {
-              cwd: root,
-              encoding: 'utf8',
-              shell: false,
-            },
-          );
+          const { stdout } = await run(process.execPath, ['--test', 'test/*.test.mjs'], {
+            cwd: root,
+            encoding: 'utf8',
+            shell: false,
+          });
           const pass = /\bpass (\d+)/.exec(stdout)?.[1] ?? '?';
           return { ok: true, detail: `${pass} test(s) passed` };
         } catch (error) {

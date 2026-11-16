@@ -47,7 +47,8 @@
     }
   },
   "scripts": {
-    "test": "node --test --test-isolation=none \"test/*.test.mjs\"",
+    "test": "node --test \"test/*.test.mjs\"",
+    "test:single-process": "node --test --test-isolation=none \"test/*.test.mjs\"",
     "audit:self": "node bin/s-eidos.mjs audit src test/fixtures/clean --format text",
     "build": "node scripts/build-client.mjs",
     "build:check": "node scripts/build-client.mjs --check",
